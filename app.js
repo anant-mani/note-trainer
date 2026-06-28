@@ -101,15 +101,19 @@
     accStatEl.textContent = `Accuracy: ${acc}%`;
   }
 
-  const NOTE_FREQUENCIES = {
-    C: 261.63, D: 293.66, E: 329.63, F: 349.23,
-    G: 392.0, A: 440.0, B: 493.88,
-  };
+  const SEMITONES_FROM_C = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
 
-  function playNoteSound(letter) {
-    if (!soundOn) return;
+  function frequencyForKey(key) {
+    const [letter, octaveStr] = key.split('/');
+    const octave = parseInt(octaveStr, 10);
+    const semitonesFromA4 = (octave - 4) * 12 + SEMITONES_FROM_C[letter] - 9;
+    return 440 * Math.pow(2, semitonesFromA4 / 12);
+  }
+
+  function playNoteSound(key) {
+    if (!soundOn || !key) return;
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const freq = NOTE_FREQUENCIES[letter];
+    const freq = frequencyForKey(key);
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -133,7 +137,7 @@
       key.className = 'whiteKey';
       key.textContent = letter;
       key.addEventListener('click', () => {
-        playNoteSound(letter);
+        playNoteSound(currentKey);
         handleAnswer(letter, key);
       });
       answersEl.appendChild(key);
