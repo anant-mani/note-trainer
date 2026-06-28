@@ -113,6 +113,7 @@
   function playNoteSound(key) {
     if (!soundOn || !key) return;
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     const freq = frequencyForKey(key);
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
