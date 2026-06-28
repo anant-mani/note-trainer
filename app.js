@@ -49,9 +49,9 @@
 
   let stats = loadStats();
   let streakByMode = { treble: 0, bass: 0, mix: 0 };
+  let levelIndexByMode = { treble: 0, bass: 0, mix: 0 };
   let clefMode = 'treble';
   let clef = 'treble';
-  let levelIndex = 0;
   let currentKey = null;
   let currentLetter = null;
   let running = false;
@@ -278,7 +278,7 @@
   }
 
   function startTimer() {
-    timerDuration = TIMER_LEVELS[levelIndex];
+    timerDuration = TIMER_LEVELS[levelIndexByMode[clefMode]];
     timerNumEl.textContent = timerDuration;
     timerFillEl.style.width = '100%';
     timerFillEl.style.background = '#4cd17a';
@@ -318,7 +318,7 @@
     sessionTimes.push(timerDuration);
     saveStats();
     streakByMode[clefMode] = 0;
-    levelIndex = Math.max(0, levelIndex - 1);
+    levelIndexByMode[clefMode] = Math.max(0, levelIndexByMode[clefMode] - 1);
     feedbackEl.textContent = "Time's up!";
     feedbackEl.className = 'timeout';
     highlightLadder('#ffb84c');
@@ -342,16 +342,16 @@
       feedbackEl.textContent = 'Correct!';
       feedbackEl.className = 'correct';
       highlightLadder('#4cd17a');
-      if (streakByMode[clefMode] >= LEVEL_UP_STREAK && levelIndex < TIMER_LEVELS.length - 1) {
-        levelIndex += 1;
+      if (streakByMode[clefMode] >= LEVEL_UP_STREAK && levelIndexByMode[clefMode] < TIMER_LEVELS.length - 1) {
+        levelIndexByMode[clefMode] += 1;
         streakByMode[clefMode] = 0;
-        if (levelIndex > stats[clefMode].bestLevelIndex) stats[clefMode].bestLevelIndex = levelIndex;
-        feedbackEl.textContent = `Correct! Speeding up to ${TIMER_LEVELS[levelIndex]}s`;
+        if (levelIndexByMode[clefMode] > stats[clefMode].bestLevelIndex) stats[clefMode].bestLevelIndex = levelIndexByMode[clefMode];
+        feedbackEl.textContent = `Correct! Speeding up to ${TIMER_LEVELS[levelIndexByMode[clefMode]]}s`;
       }
     } else {
       btn.classList.add('wrongFlash');
       streakByMode[clefMode] = 0;
-      levelIndex = Math.max(0, levelIndex - 1);
+      levelIndexByMode[clefMode] = Math.max(0, levelIndexByMode[clefMode] - 1);
       feedbackEl.textContent = 'Not quite';
       feedbackEl.className = 'wrong';
       highlightLadder('#ff5c5c');
@@ -451,8 +451,6 @@
     }
     running = true;
     paused = false;
-    streakByMode[clefMode] = 0;
-    levelIndex = 0;
     sessionIndex = 0;
     sessionCorrect = 0;
     sessionTimes = [];
@@ -523,6 +521,7 @@
     MODES.forEach((mode) => {
       stats[mode] = emptyModeStats();
       streakByMode[mode] = 0;
+      levelIndexByMode[mode] = 0;
     });
     saveStats();
     renderStats();
