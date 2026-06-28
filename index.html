@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Note Trainer</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.3/build/cjs/vexflow.js"></script>
+<!-- Cloudflare Web Analytics -->
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "751dcd38828244dda0494016f62ef230"}'></script>
+<!-- End Cloudflare Web Analytics -->
+</head>
+<body>
+<div id="app">
+
+  <header id="topbar">
+    <div id="title">Note Trainer</div>
+    <div id="stats">
+      <span id="streakStat">Streak: 0</span>
+      <span id="bestStat">Best timer: 5s</span>
+      <span id="accStat">Accuracy: 0%</span>
+    </div>
+  </header>
+
+  <main>
+    <div id="modeRow">
+      <button class="modeBtn" data-mode="treble">Treble</button>
+      <button class="modeBtn" data-mode="bass">Bass</button>
+      <button class="modeBtn" data-mode="mix">Mix</button>
+    </div>
+
+    <div id="clefRow">
+      <div id="clefLabel">Treble Clef</div>
+      <div id="questionCounter">Question 0/10</div>
+    </div>
+
+    <div id="staffWrap">
+      <div id="staff"></div>
+      <div id="pausedOverlay">Paused</div>
+    </div>
+
+    <div id="timerRow">
+      <div id="timerBar"><div id="timerFill"></div></div>
+      <div id="timerNum">5</div>
+    </div>
+
+    <div id="feedback"></div>
+
+    <div id="answers"></div>
+
+    <div id="summaryOverlay">
+      <div id="summaryCard">
+        <div id="summaryTitle">Session Complete</div>
+        <div id="summaryScore">0/10</div>
+        <div id="summaryRow"><span>Accuracy</span><span id="summaryAccuracy">0%</span></div>
+        <div id="summaryRow"><span>Avg answer time</span><span id="summarySpeed">0.0s</span></div>
+        <div id="summaryImprovement"></div>
+        <div id="summaryThanks">Thanks for practicing!</div>
+        <div id="summaryBtnRow">
+          <button id="playAgainBtn">Play Again</button>
+          <button id="homeBtn">Home</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <button id="startBtn">Start</button>
+    <button id="pauseBtn" disabled>Pause</button>
+    <button id="resetStatsBtn">Reset Stats</button>
+  </footer>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
