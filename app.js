@@ -19,13 +19,16 @@
   const BLACK_KEY_AFTER = [0, 1, 3, 4, 5];
 
   const staffEl = document.getElementById('staff');
-  const clefLabelEl = document.getElementById('clefLabel');
   const timerFillEl = document.getElementById('timerFill');
   const timerNumEl = document.getElementById('timerNum');
   const feedbackEl = document.getElementById('feedback');
   const answersEl = document.getElementById('answers');
   const startBtn = document.getElementById('startBtn');
   const pauseBtn = document.getElementById('pauseBtn');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsOverlayEl = document.getElementById('settingsOverlay');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const soundToggleBtn = document.getElementById('soundToggleBtn');
   const resetStatsBtn = document.getElementById('resetStatsBtn');
   const sessionsStatEl = document.getElementById('sessionsStat');
   const accStatEl = document.getElementById('accStat');
@@ -42,6 +45,7 @@
 
   const STORAGE_KEY = 'noteTrainerStats';
   const PREV_SESSION_KEY = 'noteTrainerPrevSession';
+  const SOUND_KEY = 'noteTrainerSoundOn';
 
   const MODES = ['treble', 'bass', 'mix'];
 
@@ -62,6 +66,8 @@
   let sessionTimes = [];
   let sessionId = 0;
   let nextRoundTimeoutId = null;
+  let soundOn = localStorage.getItem(SOUND_KEY) !== 'off';
+  let audioCtx = null;
 
   function emptyModeStats() {
     return { correct: 0, total: 0, sessions: 0 };
@@ -95,6 +101,29 @@
     accStatEl.textContent = `Accuracy: ${acc}%`;
   }
 
+  const NOTE_FREQUENCIES = {
+    C: 261.63, D: 293.66, E: 329.63, F: 349.23,
+    G: 392.0, A: 440.0, B: 493.88,
+  };
+
+  function playNoteSound(letter) {
+    if (!soundOn) return;
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const freq = NOTE_FREQUENCIES[letter];
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.5);
+  }
+
   function buildKeyboard() {
     answersEl.innerHTML = '';
     const whiteWidthPct = 100 / WHITE_KEYS.length;
@@ -103,7 +132,10 @@
       const key = document.createElement('button');
       key.className = 'whiteKey';
       key.textContent = letter;
-      key.addEventListener('click', () => handleAnswer(letter, key));
+      key.addEventListener('click', () => {
+        playNoteSound(letter);
+        handleAnswer(letter, key);
+      });
       answersEl.appendChild(key);
     });
 
@@ -263,7 +295,6 @@
 
   function drawIdleStaff() {
     const idleClef = clefMode === 'bass' ? 'bass' : 'treble';
-    clefLabelEl.textContent = idleClef === 'treble' ? 'Treble Clef' : 'Bass Clef';
     drawNote(null, idleClef);
   }
 
@@ -272,7 +303,6 @@
     const pool = clef === 'treble' ? Object.keys(TREBLE_LINE_MAP) : Object.keys(BASS_LINE_MAP);
     currentKey = nextFromBag(noteBagState[clef], pool);
     currentLetter = letterFromKey(currentKey);
-    clefLabelEl.textContent = clef === 'treble' ? 'Treble Clef' : 'Bass Clef';
     drawNote(currentKey, clef);
   }
 
@@ -516,6 +546,28 @@
     saveStats();
     renderStats();
   });
+
+  function renderSoundToggle() {
+    soundToggleBtn.textContent = soundOn ? 'On' : 'Off';
+    soundToggleBtn.classList.toggle('off', !soundOn);
+    soundToggleBtn.setAttribute('aria-pressed', String(soundOn));
+  }
+
+  soundToggleBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off');
+    renderSoundToggle();
+  });
+
+  settingsBtn.addEventListener('click', () => {
+    settingsOverlayEl.classList.add('show');
+  });
+
+  closeSettingsBtn.addEventListener('click', () => {
+    settingsOverlayEl.classList.remove('show');
+  });
+
+  renderSoundToggle();
 
   window.addEventListener('resize', () => {
     if (running) {
