@@ -2,8 +2,7 @@
   const { Renderer, Stave, StaveNote, Voice, Formatter } = Vex.Flow;
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
-  const TIMER_LEVELS = [5, 4, 3, 2];
-  const LEVEL_UP_STREAK = 5;
+  const TIMER_SECONDS = 5;
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
@@ -28,8 +27,7 @@
   const startBtn = document.getElementById('startBtn');
   const pauseBtn = document.getElementById('pauseBtn');
   const resetStatsBtn = document.getElementById('resetStatsBtn');
-  const streakStatEl = document.getElementById('streakStat');
-  const bestStatEl = document.getElementById('bestStat');
+  const sessionsStatEl = document.getElementById('sessionsStat');
   const accStatEl = document.getElementById('accStat');
   const pausedOverlayEl = document.getElementById('pausedOverlay');
   const modeBtns = document.querySelectorAll('.modeBtn');
@@ -48,8 +46,6 @@
   const MODES = ['treble', 'bass', 'mix'];
 
   let stats = loadStats();
-  let streakByMode = { treble: 0, bass: 0, mix: 0 };
-  let levelIndexByMode = { treble: 0, bass: 0, mix: 0 };
   let clefMode = 'treble';
   let clef = 'treble';
   let currentKey = null;
@@ -58,7 +54,7 @@
   let paused = false;
   let timerStart = null;
   let pauseStartedAt = null;
-  let timerDuration = TIMER_LEVELS[0];
+  let timerDuration = TIMER_SECONDS;
   let rafId = null;
   let awaitingAnswer = false;
   let sessionIndex = 0;
@@ -68,7 +64,11 @@
   let nextRoundTimeoutId = null;
 
   function emptyModeStats() {
-    return { correct: 0, total: 0, bestLevelIndex: 0 };
+    return { correct: 0, total: 0, sessions: 0 };
+  }
+
+  function formatCount(n) {
+    return new Intl.NumberFormat('en', { notation: 'compact' }).format(n);
   }
 
   function loadStats() {
@@ -79,7 +79,7 @@
     } catch (e) {}
     const result = {};
     MODES.forEach((mode) => {
-      result[mode] = (parsed && parsed[mode]) || emptyModeStats();
+      result[mode] = Object.assign(emptyModeStats(), parsed && parsed[mode]);
     });
     return result;
   }
@@ -90,8 +90,7 @@
 
   function renderStats() {
     const modeStats = stats[clefMode];
-    streakStatEl.textContent = `Streak: ${streakByMode[clefMode]}`;
-    bestStatEl.textContent = `Best timer: ${TIMER_LEVELS[modeStats.bestLevelIndex]}s`;
+    sessionsStatEl.textContent = `Sessions: ${formatCount(modeStats.sessions)}`;
     const acc = modeStats.total === 0 ? 0 : Math.round((modeStats.correct / modeStats.total) * 100);
     accStatEl.textContent = `Accuracy: ${acc}%`;
   }
@@ -278,7 +277,7 @@
   }
 
   function startTimer() {
-    timerDuration = TIMER_LEVELS[levelIndexByMode[clefMode]];
+    timerDuration = TIMER_SECONDS;
     timerNumEl.textContent = timerDuration;
     timerFillEl.style.width = '100%';
     timerFillEl.style.background = '#4cd17a';
@@ -317,8 +316,6 @@
     stats[clefMode].total += 1;
     sessionTimes.push(timerDuration);
     saveStats();
-    streakByMode[clefMode] = 0;
-    levelIndexByMode[clefMode] = Math.max(0, levelIndexByMode[clefMode] - 1);
     feedbackEl.textContent = "Time's up!";
     feedbackEl.className = 'timeout';
     highlightLadder('#ffb84c');
@@ -338,20 +335,11 @@
       btn.classList.add('correctFlash');
       stats[clefMode].correct += 1;
       sessionCorrect += 1;
-      streakByMode[clefMode] += 1;
       feedbackEl.textContent = 'Correct!';
       feedbackEl.className = 'correct';
       highlightLadder('#4cd17a');
-      if (streakByMode[clefMode] >= LEVEL_UP_STREAK && levelIndexByMode[clefMode] < TIMER_LEVELS.length - 1) {
-        levelIndexByMode[clefMode] += 1;
-        streakByMode[clefMode] = 0;
-        if (levelIndexByMode[clefMode] > stats[clefMode].bestLevelIndex) stats[clefMode].bestLevelIndex = levelIndexByMode[clefMode];
-        feedbackEl.textContent = `Correct! Speeding up to ${TIMER_LEVELS[levelIndexByMode[clefMode]]}s`;
-      }
     } else {
       btn.classList.add('wrongFlash');
-      streakByMode[clefMode] = 0;
-      levelIndexByMode[clefMode] = Math.max(0, levelIndexByMode[clefMode] - 1);
       feedbackEl.textContent = 'Not quite';
       feedbackEl.className = 'wrong';
       highlightLadder('#ff5c5c');
@@ -405,6 +393,10 @@
     awaitingAnswer = false;
     pauseBtn.disabled = true;
     pausedOverlayEl.classList.remove('show');
+
+    stats[clefMode].sessions += 1;
+    saveStats();
+    renderStats();
 
     const accuracy = Math.round((sessionCorrect / SESSION_LENGTH) * 100);
     const avgTime = sessionTimes.length
@@ -501,7 +493,7 @@
     questionCounterEl.textContent = `Question 0/${SESSION_LENGTH}`;
     currentKey = null;
     drawIdleStaff();
-    timerNumEl.textContent = TIMER_LEVELS[0];
+    timerNumEl.textContent = TIMER_SECONDS;
     timerFillEl.style.width = '100%';
     timerFillEl.style.background = '#4cd17a';
     feedbackEl.textContent = '';
@@ -520,8 +512,6 @@
   resetStatsBtn.addEventListener('click', () => {
     MODES.forEach((mode) => {
       stats[mode] = emptyModeStats();
-      streakByMode[mode] = 0;
-      levelIndexByMode[mode] = 0;
     });
     saveStats();
     renderStats();
