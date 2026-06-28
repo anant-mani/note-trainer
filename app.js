@@ -6,14 +6,30 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const TREBLE_LINE_MAP = {
+  const TREBLE_LINE_MAP_BASIC = {
     'f/5': 0, 'e/5': 0.5, 'd/5': 1, 'c/5': 1.5, 'b/4': 2,
     'a/4': 2.5, 'g/4': 3, 'f/4': 3.5, 'e/4': 4,
   };
-  const BASS_LINE_MAP = {
+  const TREBLE_LINE_MAP_GRADE1 = {
+    ...TREBLE_LINE_MAP_BASIC,
+    'g/5': -0.5, 'a/5': -1, 'b/5': -1.5, 'c/6': -2, 'd/6': -2.5, 'e/6': -3, 'f/6': -3.5,
+    'd/4': 4.5, 'c/4': 5,
+  };
+  const BASS_LINE_MAP_BASIC = {
     'a/3': 0, 'g/3': 0.5, 'f/3': 1, 'e/3': 1.5, 'd/3': 2,
     'c/3': 2.5, 'b/2': 3, 'a/2': 3.5, 'g/2': 4,
   };
+  const BASS_LINE_MAP_GRADE1 = {
+    ...BASS_LINE_MAP_BASIC,
+    'b/3': -0.5, 'c/4': -1,
+  };
+
+  const GRADES = ['basic', 'grade1'];
+
+  function lineMapFor(clefName, grade) {
+    if (clefName === 'treble') return grade === 'grade1' ? TREBLE_LINE_MAP_GRADE1 : TREBLE_LINE_MAP_BASIC;
+    return grade === 'grade1' ? BASS_LINE_MAP_GRADE1 : BASS_LINE_MAP_BASIC;
+  }
 
   const WHITE_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
   const BLACK_KEY_AFTER = [0, 1, 3, 4, 5];
@@ -33,7 +49,8 @@
   const sessionsStatEl = document.getElementById('sessionsStat');
   const accStatEl = document.getElementById('accStat');
   const pausedOverlayEl = document.getElementById('pausedOverlay');
-  const modeBtns = document.querySelectorAll('.modeBtn');
+  const modeBtns = document.querySelectorAll('#modeRow .modeBtn');
+  const gradeBtns = document.querySelectorAll('#gradeRow .modeBtn');
   const questionCounterEl = document.getElementById('questionCounter');
   const summaryOverlayEl = document.getElementById('summaryOverlay');
   const summaryScoreEl = document.getElementById('summaryScore');
@@ -52,6 +69,7 @@
   let stats = loadStats();
   let clefMode = 'treble';
   let clef = 'treble';
+  let gradeMode = 'basic';
   let currentKey = null;
   let currentLetter = null;
   let running = false;
@@ -174,6 +192,24 @@
     if (btn.dataset.mode === clefMode) btn.classList.add('active');
   });
 
+  function pickGradeMode(btn) {
+    const newGrade = btn.dataset.grade;
+    if (newGrade === gradeMode) return;
+    gradeMode = newGrade;
+    gradeBtns.forEach((b) => b.classList.toggle('active', b === btn));
+    if (running) {
+      stopTimerLoop();
+      start();
+    } else {
+      drawIdleStaff();
+    }
+  }
+
+  gradeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => pickGradeMode(btn));
+    if (btn.dataset.grade === gradeMode) btn.classList.add('active');
+  });
+
   function drawNote(key, clefName) {
     staffEl.innerHTML = '';
     const width = Math.min(staffEl.parentElement.clientWidth - 8, 420);
@@ -204,7 +240,7 @@
   }
 
   function drawNoteLadder(svg, stave, clefName, staveWidth) {
-    const lineMap = clefName === 'treble' ? TREBLE_LINE_MAP : BASS_LINE_MAP;
+    const lineMap = lineMapFor(clefName, gradeMode);
     const lineEntries = Object.entries(lineMap)
       .filter(([, line]) => Number.isInteger(line))
       .sort((a, b) => b[1] - a[1]);
@@ -305,7 +341,7 @@
 
   function pickQuestion() {
     clef = rollClef();
-    const pool = clef === 'treble' ? Object.keys(TREBLE_LINE_MAP) : Object.keys(BASS_LINE_MAP);
+    const pool = Object.keys(lineMapFor(clef, gradeMode));
     currentKey = nextFromBag(noteBagState[clef], pool);
     currentLetter = letterFromKey(currentKey);
     drawNote(currentKey, clef);
@@ -455,7 +491,10 @@
         summaryImprovementEl.textContent = `Improved! ${parts.join(' and ')} vs your last ${modeLabel} session.`;
         summaryImprovementEl.style.color = '#4cd17a';
       } else if (accDelta < 0 || speedDelta < -0.05) {
-        summaryImprovementEl.textContent = `Slower or less accurate than your last ${modeLabel} session — keep practicing!`;
+        const parts = [];
+        if (accDelta < 0) parts.push(`accuracy down ${Math.abs(accDelta)}%`);
+        if (speedDelta < -0.05) parts.push(`answered ${Math.abs(speedDelta).toFixed(1)}s slower`);
+        summaryImprovementEl.textContent = `${parts.join(' and ')} vs your last ${modeLabel} session — keep practicing!`;
         summaryImprovementEl.style.color = '#ffb84c';
       } else {
         summaryImprovementEl.textContent = `Same as your last ${modeLabel} session.`;

@@ -71,6 +71,13 @@ main {
   margin-top: 4px;
 }
 
+#gradeRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
 .modeBtn {
   flex: 1;
   padding: 9px 0;
