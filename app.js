@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.2.1';
+  const APP_VERSION = '1.2.2';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -132,7 +132,7 @@
   }
 
   const IDLE_FALLBACK_HINT = 'Tap Start to begin practicing!';
-  const ANSWER_HINT = 'Press the right note on the keyboard ↓';
+  const ANSWER_HINT_HTML = 'Press the right note on the keyboard <span class="arrowDown">&#11015;</span>';
 
   function renderGreeting() {
     const info = loadVisitInfo();
@@ -171,7 +171,7 @@
     namePromptRowEl.classList.remove('show');
     greetingRowEl.style.display = 'none';
     feedbackEl.style.display = '';
-    feedbackEl.textContent = ANSWER_HINT;
+    feedbackEl.innerHTML = ANSWER_HINT_HTML;
     feedbackEl.className = 'hint';
   }
 

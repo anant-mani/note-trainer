@@ -273,6 +273,15 @@ main {
   color: #a4906c;
 }
 
+.arrowDown {
+  display: inline-block;
+  font-size: 1.4em;
+  font-weight: 900;
+  color: #8b5e3c;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
 #feedback.correct { color: #5c8a5c; }
 #feedback.wrong { color: #b3473f; }
 #feedback.timeout { color: #b3793f; }
