@@ -273,12 +273,16 @@ main {
   color: #a4906c;
 }
 
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+}
+
 .arrowDown {
-  display: inline-block;
-  font-size: 1.4em;
-  font-weight: 900;
+  width: 1.3em;
+  height: 1.3em;
   color: #8b5e3c;
-  vertical-align: middle;
   margin-left: 2px;
 }
 

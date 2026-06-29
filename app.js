@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.3.0';
+  const APP_VERSION = '1.3.1';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -132,7 +132,12 @@
   }
 
   const IDLE_FALLBACK_HINT = 'Tap Start to begin practicing!';
-  const ANSWER_HINT_HTML = 'Press the right note on the keyboard <span class="arrowDown">&#11015;</span>';
+
+  const ICON_PLAY = '<svg class="icon" viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z" fill="currentColor"/></svg>';
+  const ICON_PAUSE = '<svg class="icon" viewBox="0 0 16 16"><rect x="3" y="2" width="4" height="12" fill="currentColor"/><rect x="9" y="2" width="4" height="12" fill="currentColor"/></svg>';
+  const ICON_ARROW_DOWN = '<svg class="icon arrowDown" viewBox="0 0 16 16"><path d="M8 1.5v10M8 11.5L3.5 7M8 11.5L12.5 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  const ANSWER_HINT_HTML = `Press the right note on the keyboard ${ICON_ARROW_DOWN}`;
 
   function renderGreeting() {
     const info = loadVisitInfo();
@@ -675,9 +680,9 @@
   }
 
   function updatePlayPauseLabel() {
-    if (!running) playPauseBtn.textContent = '▶ Start';
-    else if (paused) playPauseBtn.textContent = '▶ Resume';
-    else playPauseBtn.textContent = '⏸ Pause';
+    if (!running) playPauseBtn.innerHTML = `${ICON_PLAY} Start`;
+    else if (paused) playPauseBtn.innerHTML = `${ICON_PLAY} Resume`;
+    else playPauseBtn.innerHTML = `${ICON_PAUSE} Pause`;
   }
 
   function finishSession() {
@@ -854,6 +859,7 @@
   buildKeyboard();
   drawIdleStaff();
   renderStats();
+  updatePlayPauseLabel();
   refreshIdleMessage();
   showIntroToastIfNeeded();
 })();
