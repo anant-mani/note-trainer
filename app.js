@@ -6,6 +6,9 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
+  const APP_VERSION = '1.0.0';
+  const APP_VERSION_DATE = '2026-06-29';
+
   const TREBLE_LINE_MAP_BASIC = {
     'f/5': 0, 'e/5': 0.5, 'd/5': 1, 'c/5': 1.5, 'b/4': 2,
     'a/4': 2.5, 'g/4': 3, 'f/4': 3.5, 'e/4': 4,
@@ -42,6 +45,7 @@
   const startBtn = document.getElementById('startBtn');
   const pauseBtn = document.getElementById('pauseBtn');
   const settingsBtn = document.getElementById('settingsBtn');
+  const versionInfoEl = document.getElementById('versionInfo');
   const settingsOverlayEl = document.getElementById('settingsOverlay');
   const closeSettingsBtn = document.getElementById('closeSettingsBtn');
   const soundToggleBtn = document.getElementById('soundToggleBtn');
@@ -612,6 +616,7 @@
   });
 
   renderSoundToggle();
+  versionInfoEl.textContent = `v${APP_VERSION} — ${APP_VERSION_DATE}`;
 
   window.addEventListener('resize', () => {
     if (running) {

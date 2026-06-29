@@ -317,6 +317,13 @@ footer button {
   color: #d3d8e0;
 }
 
+#versionInfo {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: #5c6472;
+  text-align: center;
+}
+
 .toggleBtn {
   padding: 8px 18px;
   border-radius: 20px;
