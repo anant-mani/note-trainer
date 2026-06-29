@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.1.1';
+  const APP_VERSION = '1.2.0';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -52,6 +52,12 @@
   const resetStatsBtn = document.getElementById('resetStatsBtn');
   const sessionsStatEl = document.getElementById('sessionsStat');
   const accStatEl = document.getElementById('accStat');
+  const greetingRowEl = document.getElementById('greetingRow');
+  const namePromptRowEl = document.getElementById('namePromptRow');
+  const nameInputEl = document.getElementById('nameInput');
+  const nameSaveBtn = document.getElementById('nameSaveBtn');
+  const nameDismissBtn = document.getElementById('nameDismissBtn');
+  const introToastEl = document.getElementById('introToast');
   const pausedOverlayEl = document.getElementById('pausedOverlay');
   const modeBtns = document.querySelectorAll('#modeRow .modeBtn');
   const gradeBtns = document.querySelectorAll('#gradeRow .modeBtn');
@@ -68,6 +74,122 @@
   const STORAGE_KEY = 'noteTrainerStats';
   const PREV_SESSION_KEY = 'noteTrainerPrevSession';
   const SOUND_KEY = 'noteTrainerSoundOn';
+  const INTRO_SEEN_KEY = 'noteTrainerHasSeenIntro';
+  const USER_NAME_KEY = 'noteTrainerUserName';
+  const NAME_PROMPT_DISMISSED_KEY = 'noteTrainerNamePromptDismissed';
+  const VISIT_INFO_KEY = 'noteTrainerVisitInfo';
+  const NAME_PROMPT_DAYS_THRESHOLD = 3;
+
+  const DAY_FLAVOR = {
+    0: 'Happy Sunday!',
+    1: 'Happy Monday!',
+    2: 'Tuesday tune-up!',
+    3: 'Midweek practice!',
+    4: 'Thursday tones!',
+    5: 'Happy Friday!',
+    6: 'Weekend practice session?',
+  };
+
+  function todayStr() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function timeOfDayGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 5) return 'Good night';
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    if (hour < 21) return 'Good evening';
+    return 'Good night';
+  }
+
+  function loadVisitInfo() {
+    try {
+      const raw = localStorage.getItem(VISIT_INFO_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return { lastGreetedDate: null, lastPracticeDate: null, streak: 0, distinctDaysPracticed: 0 };
+  }
+
+  function saveVisitInfo(info) {
+    localStorage.setItem(VISIT_INFO_KEY, JSON.stringify(info));
+  }
+
+  function composeGreetingText(info) {
+    const today = todayStr();
+    const name = localStorage.getItem(USER_NAME_KEY);
+    const greetingName = name ? `, ${name}` : '';
+    const dayFlavor = DAY_FLAVOR[new Date().getDay()];
+
+    let line = `${timeOfDayGreeting()}${greetingName}! ${dayFlavor}`;
+    if (info.streak >= 2) {
+      line += ` Day ${info.streak} in a row!`;
+    } else if (info.lastPracticeDate && info.lastPracticeDate !== today) {
+      const gapDays = Math.round((new Date(today) - new Date(info.lastPracticeDate)) / 86400000);
+      if (gapDays > 2) line += ' Welcome back!';
+    }
+    return line;
+  }
+
+  function renderGreeting() {
+    const info = loadVisitInfo();
+    const today = todayStr();
+    if (info.lastGreetedDate === today) {
+      if (greetingRowEl.textContent) greetingRowEl.textContent = composeGreetingText(info);
+      return;
+    }
+    info.lastGreetedDate = today;
+    saveVisitInfo(info);
+    greetingRowEl.textContent = composeGreetingText(info);
+  }
+
+  function maybeShowNamePrompt() {
+    const info = loadVisitInfo();
+    const hasName = !!localStorage.getItem(USER_NAME_KEY);
+    const dismissed = localStorage.getItem(NAME_PROMPT_DISMISSED_KEY) === '1';
+    if (!hasName && !dismissed && info.distinctDaysPracticed >= NAME_PROMPT_DAYS_THRESHOLD) {
+      namePromptRowEl.classList.add('show');
+    }
+  }
+
+  nameSaveBtn.addEventListener('click', () => {
+    const name = nameInputEl.value.trim();
+    if (name) localStorage.setItem(USER_NAME_KEY, name);
+    namePromptRowEl.classList.remove('show');
+    renderGreeting();
+  });
+
+  nameDismissBtn.addEventListener('click', () => {
+    localStorage.setItem(NAME_PROMPT_DISMISSED_KEY, '1');
+    namePromptRowEl.classList.remove('show');
+  });
+
+  function recordPracticeDay() {
+    const info = loadVisitInfo();
+    const today = todayStr();
+    if (info.lastPracticeDate === today) return;
+
+    if (info.lastPracticeDate) {
+      const gapDays = Math.round((new Date(today) - new Date(info.lastPracticeDate)) / 86400000);
+      info.streak = gapDays === 1 ? info.streak + 1 : 1;
+    } else {
+      info.streak = 1;
+    }
+    info.lastPracticeDate = today;
+    info.distinctDaysPracticed += 1;
+    saveVisitInfo(info);
+  }
+
+  function showIntroToastIfNeeded() {
+    if (localStorage.getItem(INTRO_SEEN_KEY) === '1') return;
+    introToastEl.classList.add('show');
+    const dismiss = () => {
+      introToastEl.classList.remove('show');
+      localStorage.setItem(INTRO_SEEN_KEY, '1');
+    };
+    introToastEl.addEventListener('click', dismiss, { once: true });
+    setTimeout(dismiss, 5000);
+  }
 
   const MODES = ['treble', 'bass', 'mix'];
 
@@ -416,7 +538,7 @@
       highlightLadder('#5c8a5c');
     } else {
       btn.classList.add('wrongFlash');
-      feedbackEl.textContent = 'Not quite';
+      feedbackEl.textContent = 'Not quite — keep going!';
       feedbackEl.className = 'wrong';
       highlightLadder('#b3473f');
     }
@@ -538,6 +660,8 @@
     stats[clefMode].sessions += 1;
     saveStats();
     renderStats();
+    recordPracticeDay();
+    maybeShowNamePrompt();
 
     const accuracy = Math.round((sessionCorrect / SESSION_LENGTH) * 100);
     const avgTime = sessionTimes.length
@@ -697,4 +821,7 @@
   buildKeyboard();
   drawIdleStaff();
   renderStats();
+  renderGreeting();
+  maybeShowNamePrompt();
+  showIntroToastIfNeeded();
 })();

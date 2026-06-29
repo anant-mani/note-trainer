@@ -22,7 +22,17 @@
       <span id="sessionsStat">Sessions: 0</span>
       <span id="accStat">Accuracy: 0%</span>
     </div>
+    <div id="greetingRow"></div>
+    <div id="namePromptRow">
+      <input id="nameInput" type="text" placeholder="Your name" maxlength="20">
+      <button id="nameSaveBtn">Save</button>
+      <button id="nameDismissBtn" aria-label="Dismiss">&times;</button>
+    </div>
   </header>
+
+  <div id="introToast">
+    Each round is 10 questions — mistakes are OK, just keep going! Watch the staff for a new note each round.
+  </div>
 
   <main>
     <div id="gradeRow">

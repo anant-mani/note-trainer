@@ -57,6 +57,72 @@ html, body {
   color: #8b6f4e;
 }
 
+#greetingRow {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #6b5636;
+  min-height: 1.2rem;
+}
+
+#namePromptRow {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+#namePromptRow.show {
+  display: flex;
+}
+
+#nameInput {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #d8c9a3;
+  border-radius: 6px;
+  background: #fffdf8;
+  color: #4a3a22;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+#nameSaveBtn {
+  padding: 7px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #8b5e3c;
+  color: #fdf8ef;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+#nameDismissBtn {
+  border: none;
+  background: transparent;
+  color: #a4906c;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 4px;
+  font-family: inherit;
+}
+
+#introToast {
+  display: none;
+  margin: 0 14px;
+  padding: 12px 14px;
+  background: #4a3a22;
+  color: #f3ead7;
+  font-size: 0.85rem;
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+#introToast.show {
+  display: block;
+}
+
 main {
   flex: 1;
   display: flex;
