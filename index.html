@@ -25,15 +25,15 @@
   </header>
 
   <main>
-    <div id="modeRow">
-      <button class="modeBtn" data-mode="treble">Treble</button>
-      <button class="modeBtn" data-mode="bass">Bass</button>
-      <button class="modeBtn" data-mode="mix">Mix</button>
-    </div>
-
     <div id="gradeRow">
       <button class="modeBtn" data-grade="basic">Basic</button>
       <button class="modeBtn" data-grade="grade1">Grade 1</button>
+    </div>
+
+    <div id="modeRow">
+      <button class="modeBtn clefBtn" data-mode="treble">&#119070;</button>
+      <button class="modeBtn clefBtn" data-mode="bass">&#119074;</button>
+      <button class="modeBtn clefBtn" data-mode="mix">&#119070;&#119074;</button>
     </div>
 
     <div id="clefRow">
@@ -71,13 +71,13 @@
 
     <div id="settingsOverlay">
       <div id="settingsCard">
+        <button id="closeSettingsBtn" aria-label="Close">&times;</button>
         <div id="settingsTitle">Settings</div>
         <div id="settingsRow">
           <span>Key press sound</span>
           <button id="soundToggleBtn" class="toggleBtn" aria-pressed="true">On</button>
         </div>
         <button id="resetStatsBtn">Reset Stats</button>
-        <button id="closeSettingsBtn">Close</button>
         <div id="versionInfo"></div>
       </div>
     </div>

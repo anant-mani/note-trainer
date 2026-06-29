@@ -64,14 +64,14 @@ main {
   padding: 8px 12px;
 }
 
-#modeRow {
+#gradeRow {
   display: flex;
   gap: 8px;
   width: 100%;
   margin-top: 4px;
 }
 
-#gradeRow {
+#modeRow {
   display: flex;
   gap: 8px;
   width: 100%;
@@ -87,6 +87,12 @@ main {
   color: #9aa4b2;
   font-size: 0.85rem;
   font-weight: 600;
+}
+
+.clefBtn {
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 6px 0;
 }
 
 .modeBtn.active {
@@ -292,11 +298,26 @@ footer button {
 }
 
 #settingsCard {
+  position: relative;
   width: 100%;
   max-width: 360px;
   background: #1b2029;
   border-radius: 16px;
   padding: 24px 22px;
+}
+
+#closeSettingsBtn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #9aa4b2;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0;
 }
 
 #settingsTitle {
@@ -346,18 +367,6 @@ footer button {
   border: none;
   background: #3a2230;
   color: #ff8fa3;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-#closeSettingsBtn {
-  width: 100%;
-  margin-top: 10px;
-  padding: 13px 0;
-  border-radius: 10px;
-  border: none;
-  background: #2a2f3a;
-  color: #eef1f5;
   font-size: 1rem;
   font-weight: 700;
 }
