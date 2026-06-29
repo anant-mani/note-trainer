@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.0.1';
+  const APP_VERSION = '1.1.0';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -60,6 +60,7 @@
   const summaryScoreEl = document.getElementById('summaryScore');
   const summaryAccuracyEl = document.getElementById('summaryAccuracy');
   const summarySpeedEl = document.getElementById('summarySpeed');
+  const summarySparkEl = document.getElementById('summarySpark');
   const summaryImprovementEl = document.getElementById('summaryImprovement');
   const playAgainBtn = document.getElementById('playAgainBtn');
   const homeBtn = document.getElementById('homeBtn');
@@ -270,7 +271,7 @@
       text.setAttribute('transform', `rotate(-22 ${x} ${y})`);
       text.setAttribute('font-size', '13');
       text.setAttribute('font-weight', '700');
-      text.setAttribute('fill', '#7d8696');
+      text.setAttribute('fill', '#a4906c');
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('data-key', key);
       text.textContent = letter;
@@ -295,7 +296,7 @@
     label.removeAttribute('transform');
     label.setAttribute('fill', color);
     label.setAttribute('font-size', '34');
-    label.setAttribute('stroke', '#14181f');
+    label.setAttribute('stroke', '#fffdf8');
     label.setAttribute('stroke-width', '1.2');
     label.setAttribute('paint-order', 'stroke');
     label.parentNode.appendChild(label);
@@ -355,7 +356,7 @@
     timerDuration = TIMER_SECONDS;
     timerNumEl.textContent = timerDuration;
     timerFillEl.style.width = '100%';
-    timerFillEl.style.background = '#4cd17a';
+    timerFillEl.style.background = '#5c8a5c';
     timerStart = performance.now();
     awaitingAnswer = true;
     tick();
@@ -369,9 +370,9 @@
     timerFillEl.style.width = pct + '%';
     timerNumEl.textContent = remaining.toFixed(1);
     if (remaining <= timerDuration * 0.34) {
-      timerFillEl.style.background = '#ff5c5c';
+      timerFillEl.style.background = '#b3473f';
     } else if (remaining <= timerDuration * 0.6) {
-      timerFillEl.style.background = '#ffb84c';
+      timerFillEl.style.background = '#b3793f';
     }
     if (remaining <= 0) {
       if (awaitingAnswer) handleTimeout();
@@ -393,7 +394,7 @@
     saveStats();
     feedbackEl.textContent = "Time's up!";
     feedbackEl.className = 'timeout';
-    highlightLadder('#ffb84c');
+    highlightLadder('#b3793f');
     renderStats();
     nextRound(ROUND_DELAY);
   }
@@ -412,12 +413,12 @@
       sessionCorrect += 1;
       feedbackEl.textContent = 'Correct!';
       feedbackEl.className = 'correct';
-      highlightLadder('#4cd17a');
+      highlightLadder('#5c8a5c');
     } else {
       btn.classList.add('wrongFlash');
       feedbackEl.textContent = 'Not quite';
       feedbackEl.className = 'wrong';
-      highlightLadder('#ff5c5c');
+      highlightLadder('#b3473f');
     }
 
     saveStats();
@@ -463,6 +464,71 @@
     localStorage.setItem(PREV_SESSION_KEY, JSON.stringify(all));
   }
 
+  const SESSION_HISTORY_KEY = 'noteTrainerSessionHistory';
+  const SESSION_HISTORY_LENGTH = 8;
+
+  function loadSessionHistory() {
+    try {
+      const raw = localStorage.getItem(SESSION_HISTORY_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {};
+  }
+
+  function pushSessionHistory(mode, session) {
+    const all = loadSessionHistory();
+    const list = all[mode] || [];
+    list.push(session);
+    while (list.length > SESSION_HISTORY_LENGTH) list.shift();
+    all[mode] = list;
+    localStorage.setItem(SESSION_HISTORY_KEY, JSON.stringify(all));
+    return list;
+  }
+
+  function drawSummarySpark(history) {
+    summarySparkEl.innerHTML = '';
+    if (history.length < 2) return;
+
+    const width = 220;
+    const height = 50;
+    const padX = 10;
+    const padY = 8;
+    const maxAcc = 100;
+    const minAcc = Math.min(60, ...history.map((h) => h.accuracy));
+
+    const points = history.map((h, i) => {
+      const x = padX + (i / (history.length - 1)) * (width - padX * 2);
+      const ratio = (h.accuracy - minAcc) / (maxAcc - minAcc || 1);
+      const y = height - padY - ratio * (height - padY * 2);
+      return [x, y];
+    });
+
+    const polyline = document.createElementNS(SVG_NS, 'polyline');
+    polyline.setAttribute('points', points.map((p) => p.join(',')).join(' '));
+    polyline.setAttribute('fill', 'none');
+    polyline.setAttribute('stroke', '#8b5e3c');
+    polyline.setAttribute('stroke-width', '2.2');
+    summarySparkEl.appendChild(polyline);
+
+    const [lastX, lastY] = points[points.length - 1];
+    const dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('cx', lastX);
+    dot.setAttribute('cy', lastY);
+    dot.setAttribute('r', '3.5');
+    dot.setAttribute('fill', '#8b5e3c');
+    summarySparkEl.appendChild(dot);
+
+    const lastSession = history[history.length - 1];
+    const label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('x', Math.min(lastX, width - 28));
+    label.setAttribute('y', Math.max(lastY - 8, 10));
+    label.setAttribute('font-size', '10');
+    label.setAttribute('font-weight', '700');
+    label.setAttribute('fill', '#6b5636');
+    label.textContent = `${lastSession.score}/${SESSION_LENGTH}`;
+    summarySparkEl.appendChild(label);
+  }
+
   function finishSession() {
     running = false;
     awaitingAnswer = false;
@@ -493,23 +559,25 @@
         if (accDelta > 0) parts.push(`accuracy up ${accDelta}%`);
         if (speedDelta > 0.05) parts.push(`answered ${speedDelta.toFixed(1)}s faster`);
         summaryImprovementEl.textContent = `Improved! ${parts.join(' and ')} vs your last ${modeLabel} session.`;
-        summaryImprovementEl.style.color = '#4cd17a';
+        summaryImprovementEl.style.color = '#5c8a5c';
       } else if (accDelta < 0 || speedDelta < -0.05) {
         const parts = [];
         if (accDelta < 0) parts.push(`accuracy down ${Math.abs(accDelta)}%`);
         if (speedDelta < -0.05) parts.push(`answered ${Math.abs(speedDelta).toFixed(1)}s slower`);
         summaryImprovementEl.textContent = `${parts.join(' and ')} vs your last ${modeLabel} session — keep practicing!`;
-        summaryImprovementEl.style.color = '#ffb84c';
+        summaryImprovementEl.style.color = '#b3793f';
       } else {
         summaryImprovementEl.textContent = `Same as your last ${modeLabel} session.`;
-        summaryImprovementEl.style.color = '#9aa4b2';
+        summaryImprovementEl.style.color = '#a4906c';
       }
     } else {
       summaryImprovementEl.textContent = `Play again in ${modeLabel} mode to track your improvement!`;
-      summaryImprovementEl.style.color = '#9aa4b2';
+      summaryImprovementEl.style.color = '#a4906c';
     }
 
     saveSessionAsPrev(clefMode, { accuracy, avgTime });
+    const history = pushSessionHistory(clefMode, { accuracy, avgTime, score: sessionCorrect });
+    drawSummarySpark(history);
     summaryOverlayEl.classList.add('show');
   }
 
@@ -573,7 +641,7 @@
     drawIdleStaff();
     timerNumEl.textContent = TIMER_SECONDS;
     timerFillEl.style.width = '100%';
-    timerFillEl.style.background = '#4cd17a';
+    timerFillEl.style.background = '#5c8a5c';
     feedbackEl.textContent = '';
     feedbackEl.className = '';
     document.querySelectorAll('.whiteKey').forEach((b) => {

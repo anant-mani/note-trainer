@@ -3,9 +3,9 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: #14181f;
-  color: #eef1f5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f3ead7;
+  color: #4a3a22;
+  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
   height: 100%;
   overscroll-behavior: none;
 }
@@ -33,19 +33,20 @@ html, body {
 #title {
   font-size: 1.3rem;
   font-weight: 700;
+  color: #4a3a22;
 }
 
 #settingsBtn {
   background: none;
   border: none;
-  color: #9aa4b2;
+  color: #8b6f4e;
   font-size: 1.4rem;
   line-height: 1;
   padding: 4px 6px;
 }
 
 #settingsBtn:active {
-  color: #eef1f5;
+  color: #4a3a22;
 }
 
 #stats {
@@ -53,7 +54,7 @@ html, body {
   justify-content: space-between;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #9aa4b2;
+  color: #8b6f4e;
 }
 
 main {
@@ -81,12 +82,13 @@ main {
 .modeBtn {
   flex: 1;
   padding: 9px 0;
-  border-radius: 8px;
-  border: 1px solid #2a2f3a;
-  background: #1b2029;
-  color: #9aa4b2;
+  border-radius: 6px;
+  border: 1px solid #d8c9a3;
+  background: #e8dcc0;
+  color: #8b6f4e;
   font-size: 0.85rem;
   font-weight: 600;
+  font-family: inherit;
 }
 
 .clefBtn {
@@ -96,9 +98,9 @@ main {
 }
 
 .modeBtn.active {
-  background: #4c7dff;
-  color: #fff;
-  border-color: #4c7dff;
+  background: #8b5e3c;
+  color: #fdf8ef;
+  border-color: #8b5e3c;
 }
 
 .modeBtn:disabled {
@@ -114,7 +116,7 @@ main {
 
 #questionCounter {
   font-size: 1.05rem;
-  color: #d3d8e0;
+  color: #6b5636;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -122,8 +124,9 @@ main {
 #staffWrap {
   position: relative;
   width: 100%;
-  background: #fff;
-  border-radius: 12px;
+  background: #fffdf8;
+  border: 1px solid #d8c9a3;
+  border-radius: 10px;
   padding: 10px 4px;
   display: flex;
   justify-content: center;
@@ -134,13 +137,13 @@ main {
   display: none;
   position: absolute;
   inset: 0;
-  background: rgba(20, 24, 31, 0.78);
-  color: #fff;
+  background: rgba(74, 58, 34, 0.78);
+  color: #fdf8ef;
   font-size: 1.4rem;
   font-weight: 700;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 #pausedOverlay.show {
@@ -163,14 +166,14 @@ main {
   flex: 1;
   height: 10px;
   border-radius: 6px;
-  background: #2a2f3a;
+  background: #e8dcc0;
   overflow: hidden;
 }
 
 #timerFill {
   height: 100%;
   width: 100%;
-  background: #4cd17a;
+  background: #5c8a5c;
   transition: width 0.1s linear, background 0.2s;
 }
 
@@ -189,9 +192,9 @@ main {
   margin: 4px 0;
 }
 
-#feedback.correct { color: #4cd17a; }
-#feedback.wrong { color: #ff5c5c; }
-#feedback.timeout { color: #ffb84c; }
+#feedback.correct { color: #5c8a5c; }
+#feedback.wrong { color: #b3473f; }
+#feedback.timeout { color: #b3793f; }
 
 #answers {
   position: relative;
@@ -206,17 +209,18 @@ main {
   flex: 1;
   position: relative;
   z-index: 1;
-  background: #f5f6f8;
-  border: 1px solid #cfd3da;
+  background: #fffdf8;
+  border: 1px solid #d8c9a3;
   border-left-width: 0;
   border-radius: 0 0 8px 8px;
-  color: #2a2f3a;
+  color: #4a3a22;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 8px;
   font-size: 0.85rem;
   font-weight: 700;
+  font-family: inherit;
   touch-action: manipulation;
 }
 
@@ -230,17 +234,17 @@ main {
 }
 
 .whiteKey:active {
-  background: #e2e5ec;
+  background: #f3ead7;
 }
 
 .whiteKey.correctFlash {
-  background: #4cd17a !important;
-  color: #14181f;
+  background: #5c8a5c !important;
+  color: #fdf8ef;
 }
 
 .whiteKey.wrongFlash {
-  background: #ff5c5c !important;
-  color: #14181f;
+  background: #b3473f !important;
+  color: #fdf8ef;
 }
 
 .blackKey {
@@ -248,7 +252,7 @@ main {
   top: 0;
   height: 62%;
   z-index: 2;
-  background: #20242e;
+  background: #4a3a22;
   border-radius: 0 0 5px 5px;
   pointer-events: none;
 }
@@ -262,20 +266,21 @@ footer {
 footer button {
   flex: 1;
   padding: 15px 0;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
   font-size: 1.05rem;
   font-weight: 700;
+  font-family: inherit;
 }
 
 #startBtn {
-  background: #4c7dff;
-  color: #fff;
+  background: #8b5e3c;
+  color: #fdf8ef;
 }
 
 #pauseBtn {
-  background: #2a2f3a;
-  color: #eef1f5;
+  background: #e8dcc0;
+  color: #6b5636;
 }
 
 #pauseBtn:disabled {
@@ -286,7 +291,7 @@ footer button {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(10, 12, 16, 0.88);
+  background: rgba(74, 58, 34, 0.45);
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -301,8 +306,9 @@ footer button {
   position: relative;
   width: 100%;
   max-width: 360px;
-  background: #1b2029;
-  border-radius: 16px;
+  background: #f3ead7;
+  border: 1px solid #d8c9a3;
+  border-radius: 14px;
   padding: 24px 22px;
 }
 
@@ -314,15 +320,16 @@ footer button {
   height: 28px;
   border: none;
   background: transparent;
-  color: #9aa4b2;
+  color: #8b6f4e;
   font-size: 1.5rem;
   line-height: 1;
   padding: 0;
+  font-family: inherit;
 }
 
 #settingsTitle {
   font-size: 1.05rem;
-  color: #9aa4b2;
+  color: #6b5636;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -335,13 +342,13 @@ footer button {
   justify-content: space-between;
   padding: 10px 0 18px;
   font-size: 0.95rem;
-  color: #d3d8e0;
+  color: #4a3a22;
 }
 
 #versionInfo {
   margin-top: 14px;
   font-size: 0.75rem;
-  color: #5c6472;
+  color: #a4906c;
   text-align: center;
 }
 
@@ -349,33 +356,35 @@ footer button {
   padding: 8px 18px;
   border-radius: 20px;
   border: none;
-  background: #4c7dff;
-  color: #fff;
+  background: #8b5e3c;
+  color: #fdf8ef;
   font-weight: 700;
   font-size: 0.85rem;
+  font-family: inherit;
 }
 
 .toggleBtn.off {
-  background: #2a2f3a;
-  color: #9aa4b2;
+  background: #e8dcc0;
+  color: #8b6f4e;
 }
 
 #resetStatsBtn {
   width: 100%;
   padding: 13px 0;
-  border-radius: 10px;
-  border: none;
-  background: #3a2230;
-  color: #ff8fa3;
+  border-radius: 8px;
+  border: 1px solid #c98f7a;
+  background: #f3ddd5;
+  color: #a14a3a;
   font-size: 1rem;
   font-weight: 700;
+  font-family: inherit;
 }
 
 #summaryOverlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(10, 12, 16, 0.88);
+  background: rgba(74, 58, 34, 0.45);
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -389,15 +398,16 @@ footer button {
 #summaryCard {
   width: 100%;
   max-width: 360px;
-  background: #1b2029;
-  border-radius: 16px;
+  background: #f3ead7;
+  border: 1px solid #d8c9a3;
+  border-radius: 14px;
   padding: 24px 22px;
   text-align: center;
 }
 
 #summaryTitle {
   font-size: 1.05rem;
-  color: #9aa4b2;
+  color: #6b5636;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -407,7 +417,7 @@ footer button {
 #summaryScore {
   font-size: 2.6rem;
   font-weight: 800;
-  color: #4c7dff;
+  color: #8b5e3c;
   margin-bottom: 16px;
 }
 
@@ -416,22 +426,29 @@ footer button {
   justify-content: space-between;
   font-size: 0.95rem;
   padding: 8px 0;
-  border-top: 1px solid #2a2f3a;
-  color: #d3d8e0;
+  border-top: 1px solid #d8c9a3;
+  color: #4a3a22;
+}
+
+#summarySpark {
+  display: block;
+  width: 100%;
+  height: 50px;
+  margin-top: 14px;
 }
 
 #summaryImprovement {
-  margin-top: 14px;
+  margin-top: 10px;
   min-height: 1.4rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #4cd17a;
+  color: #5c8a5c;
 }
 
 #summaryThanks {
   margin-top: 14px;
   font-size: 0.95rem;
-  color: #9aa4b2;
+  color: #8b6f4e;
 }
 
 #summaryBtnRow {
@@ -443,18 +460,19 @@ footer button {
 #summaryBtnRow button {
   flex: 1;
   padding: 13px 0;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
   font-size: 1rem;
   font-weight: 700;
+  font-family: inherit;
 }
 
 #playAgainBtn {
-  background: #4c7dff;
-  color: #fff;
+  background: #8b5e3c;
+  color: #fdf8ef;
 }
 
 #homeBtn {
-  background: #2a2f3a;
-  color: #eef1f5;
+  background: #e8dcc0;
+  color: #6b5636;
 }
