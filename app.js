@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.2.2';
+  const APP_VERSION = '1.2.3';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -639,14 +639,15 @@
     const width = 220;
     const height = 50;
     const padX = 10;
-    const padY = 8;
+    const padTop = 16;
+    const padBottom = 8;
     const maxAcc = 100;
     const minAcc = Math.min(60, ...history.map((h) => h.accuracy));
 
     const points = history.map((h, i) => {
       const x = padX + (i / (history.length - 1)) * (width - padX * 2);
       const ratio = (h.accuracy - minAcc) / (maxAcc - minAcc || 1);
-      const y = height - padY - ratio * (height - padY * 2);
+      const y = height - padBottom - ratio * (height - padTop - padBottom);
       return [x, y];
     });
 
@@ -668,7 +669,7 @@
     const lastSession = history[history.length - 1];
     const label = document.createElementNS(SVG_NS, 'text');
     label.setAttribute('x', Math.min(lastX, width - 28));
-    label.setAttribute('y', Math.max(lastY - 8, 10));
+    label.setAttribute('y', lastY - 8);
     label.setAttribute('font-size', '10');
     label.setAttribute('font-weight', '700');
     label.setAttribute('fill', '#6b5636');
