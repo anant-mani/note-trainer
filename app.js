@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.2.0';
+  const APP_VERSION = '1.2.1';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -131,11 +131,14 @@
     return line;
   }
 
+  const IDLE_FALLBACK_HINT = 'Tap Start to begin practicing!';
+  const ANSWER_HINT = 'Press the right note on the keyboard ↓';
+
   function renderGreeting() {
     const info = loadVisitInfo();
     const today = todayStr();
     if (info.lastGreetedDate === today) {
-      if (greetingRowEl.textContent) greetingRowEl.textContent = composeGreetingText(info);
+      greetingRowEl.textContent = IDLE_FALLBACK_HINT;
       return;
     }
     info.lastGreetedDate = today;
@@ -143,25 +146,46 @@
     greetingRowEl.textContent = composeGreetingText(info);
   }
 
-  function maybeShowNamePrompt() {
+  function isNamePromptEligible() {
     const info = loadVisitInfo();
     const hasName = !!localStorage.getItem(USER_NAME_KEY);
     const dismissed = localStorage.getItem(NAME_PROMPT_DISMISSED_KEY) === '1';
-    if (!hasName && !dismissed && info.distinctDaysPracticed >= NAME_PROMPT_DAYS_THRESHOLD) {
+    return !hasName && !dismissed && info.distinctDaysPracticed >= NAME_PROMPT_DAYS_THRESHOLD;
+  }
+
+  function refreshIdleMessage() {
+    feedbackEl.style.display = 'none';
+    feedbackEl.textContent = '';
+    feedbackEl.className = '';
+    if (isNamePromptEligible()) {
       namePromptRowEl.classList.add('show');
+      greetingRowEl.style.display = 'none';
+    } else {
+      namePromptRowEl.classList.remove('show');
+      greetingRowEl.style.display = '';
+      renderGreeting();
     }
+  }
+
+  function showAnswerHint() {
+    namePromptRowEl.classList.remove('show');
+    greetingRowEl.style.display = 'none';
+    feedbackEl.style.display = '';
+    feedbackEl.textContent = ANSWER_HINT;
+    feedbackEl.className = 'hint';
   }
 
   nameSaveBtn.addEventListener('click', () => {
     const name = nameInputEl.value.trim();
     if (name) localStorage.setItem(USER_NAME_KEY, name);
     namePromptRowEl.classList.remove('show');
-    renderGreeting();
+    refreshIdleMessage();
   });
 
   nameDismissBtn.addEventListener('click', () => {
     localStorage.setItem(NAME_PROMPT_DISMISSED_KEY, '1');
     namePromptRowEl.classList.remove('show');
+    refreshIdleMessage();
   });
 
   function recordPracticeDay() {
@@ -481,6 +505,7 @@
     timerFillEl.style.background = '#5c8a5c';
     timerStart = performance.now();
     awaitingAnswer = true;
+    showAnswerHint();
     tick();
   }
 
@@ -661,7 +686,7 @@
     saveStats();
     renderStats();
     recordPracticeDay();
-    maybeShowNamePrompt();
+    refreshIdleMessage();
 
     const accuracy = Math.round((sessionCorrect / SESSION_LENGTH) * 100);
     const avgTime = sessionTimes.length
@@ -766,8 +791,7 @@
     timerNumEl.textContent = TIMER_SECONDS;
     timerFillEl.style.width = '100%';
     timerFillEl.style.background = '#5c8a5c';
-    feedbackEl.textContent = '';
-    feedbackEl.className = '';
+    refreshIdleMessage();
     document.querySelectorAll('.whiteKey').forEach((b) => {
       b.classList.remove('correctFlash', 'wrongFlash');
     });
@@ -821,7 +845,6 @@
   buildKeyboard();
   drawIdleStaff();
   renderStats();
-  renderGreeting();
-  maybeShowNamePrompt();
+  refreshIdleMessage();
   showIntroToastIfNeeded();
 })();

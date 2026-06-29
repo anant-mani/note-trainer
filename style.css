@@ -58,18 +58,18 @@ html, body {
 }
 
 #greetingRow {
-  margin-top: 8px;
+  width: 100%;
   font-size: 0.95rem;
   font-weight: 600;
   color: #6b5636;
-  min-height: 1.2rem;
+  text-align: center;
 }
 
 #namePromptRow {
   display: none;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
+  width: 100%;
 }
 
 #namePromptRow.show {
@@ -251,11 +251,26 @@ main {
   font-variant-numeric: tabular-nums;
 }
 
+#messageArea {
+  width: 100%;
+  min-height: 2.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: 4px 0;
+}
+
 #feedback {
-  min-height: 1.6rem;
+  width: 100%;
   font-size: 1.05rem;
   font-weight: 700;
-  margin: 4px 0;
+}
+
+#feedback.hint {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #a4906c;
 }
 
 #feedback.correct { color: #5c8a5c; }

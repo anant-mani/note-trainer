@@ -22,12 +22,6 @@
       <span id="sessionsStat">Sessions: 0</span>
       <span id="accStat">Accuracy: 0%</span>
     </div>
-    <div id="greetingRow"></div>
-    <div id="namePromptRow">
-      <input id="nameInput" type="text" placeholder="Your name" maxlength="20">
-      <button id="nameSaveBtn">Save</button>
-      <button id="nameDismissBtn" aria-label="Dismiss">&times;</button>
-    </div>
   </header>
 
   <div id="introToast">
@@ -60,7 +54,15 @@
       <div id="timerNum">5</div>
     </div>
 
-    <div id="feedback"></div>
+    <div id="messageArea">
+      <div id="feedback"></div>
+      <div id="greetingRow"></div>
+      <div id="namePromptRow">
+        <input id="nameInput" type="text" placeholder="Your name" maxlength="20">
+        <button id="nameSaveBtn">Save</button>
+        <button id="nameDismissBtn" aria-label="Dismiss">&times;</button>
+      </div>
+    </div>
 
     <div id="answers"></div>
 
