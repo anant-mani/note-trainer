@@ -6,7 +6,7 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.2.3';
+  const APP_VERSION = '1.3.0';
   const APP_VERSION_DATE = '2026-06-29';
 
   const TREBLE_LINE_MAP_BASIC = {
@@ -42,8 +42,8 @@
   const timerNumEl = document.getElementById('timerNum');
   const feedbackEl = document.getElementById('feedback');
   const answersEl = document.getElementById('answers');
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
   const settingsBtn = document.getElementById('settingsBtn');
   const versionInfoEl = document.getElementById('versionInfo');
   const settingsOverlayEl = document.getElementById('settingsOverlay');
@@ -325,17 +325,13 @@
   }
 
   function pickClefMode(btn) {
+    if (running) return;
     const newMode = btn.dataset.mode;
     if (newMode === clefMode) return;
     clefMode = newMode;
     modeBtns.forEach((b) => b.classList.toggle('active', b === btn));
     renderStats();
-    if (running) {
-      stopTimerLoop();
-      start();
-    } else {
-      drawIdleStaff();
-    }
+    drawIdleStaff();
   }
 
   modeBtns.forEach((btn) => {
@@ -344,16 +340,12 @@
   });
 
   function pickGradeMode(btn) {
+    if (running) return;
     const newGrade = btn.dataset.grade;
     if (newGrade === gradeMode) return;
     gradeMode = newGrade;
     gradeBtns.forEach((b) => b.classList.toggle('active', b === btn));
-    if (running) {
-      stopTimerLoop();
-      start();
-    } else {
-      drawIdleStaff();
-    }
+    drawIdleStaff();
   }
 
   gradeBtns.forEach((btn) => {
@@ -677,10 +669,23 @@
     summarySparkEl.appendChild(label);
   }
 
+  function setModeGradeLocked(locked) {
+    modeBtns.forEach((b) => { b.disabled = locked; });
+    gradeBtns.forEach((b) => { b.disabled = locked; });
+  }
+
+  function updatePlayPauseLabel() {
+    if (!running) playPauseBtn.textContent = '▶ Start';
+    else if (paused) playPauseBtn.textContent = '▶ Resume';
+    else playPauseBtn.textContent = '⏸ Pause';
+  }
+
   function finishSession() {
     running = false;
     awaitingAnswer = false;
-    pauseBtn.disabled = true;
+    stopBtn.disabled = true;
+    updatePlayPauseLabel();
+    setModeGradeLocked(false);
     pausedOverlayEl.classList.remove('show');
 
     stats[clefMode].sessions += 1;
@@ -742,9 +747,9 @@
     sessionIndex = 0;
     sessionCorrect = 0;
     sessionTimes = [];
-    startBtn.textContent = 'Restart';
-    pauseBtn.disabled = false;
-    pauseBtn.textContent = 'Pause';
+    updatePlayPauseLabel();
+    stopBtn.disabled = false;
+    setModeGradeLocked(true);
     pausedOverlayEl.classList.remove('show');
     summaryOverlayEl.classList.remove('show');
     beginQuestion();
@@ -756,14 +761,14 @@
     paused = !paused;
     if (paused) {
       pauseStartedAt = performance.now();
-      pauseBtn.textContent = 'Resume';
+      updatePlayPauseLabel();
       pausedOverlayEl.classList.add('show');
       if (rafId) cancelAnimationFrame(rafId);
       rafId = null;
     } else {
       const pausedFor = performance.now() - pauseStartedAt;
       timerStart += pausedFor;
-      pauseBtn.textContent = 'Pause';
+      updatePlayPauseLabel();
       pausedOverlayEl.classList.remove('show');
       tick();
     }
@@ -782,9 +787,9 @@
     rafId = null;
     summaryOverlayEl.classList.remove('show');
     pausedOverlayEl.classList.remove('show');
-    startBtn.textContent = 'Start';
-    pauseBtn.disabled = true;
-    pauseBtn.textContent = 'Pause';
+    updatePlayPauseLabel();
+    stopBtn.disabled = true;
+    setModeGradeLocked(false);
     sessionIndex = 0;
     questionCounterEl.textContent = `Question 0/${SESSION_LENGTH}`;
     currentKey = null;
@@ -799,8 +804,11 @@
     renderStats();
   }
 
-  startBtn.addEventListener('click', start);
-  pauseBtn.addEventListener('click', togglePause);
+  playPauseBtn.addEventListener('click', () => {
+    if (!running) start();
+    else togglePause();
+  });
+  stopBtn.addEventListener('click', goHome);
   playAgainBtn.addEventListener('click', start);
   homeBtn.addEventListener('click', goHome);
 
