@@ -6,8 +6,8 @@
   const SESSION_LENGTH = 10;
   const ROUND_DELAY = 1500;
 
-  const APP_VERSION = '1.3.2';
-  const APP_VERSION_DATE = '2026-06-29';
+  const APP_VERSION = '1.3.3';
+  const APP_VERSION_DATE = '2026-06-30';
 
   const TREBLE_LINE_MAP_BASIC = {
     'f/5': 0, 'e/5': 0.5, 'd/5': 1, 'c/5': 1.5, 'b/4': 2,
